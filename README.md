@@ -1,10 +1,11 @@
 # DevOps / Site Reliability Engineer - Technical Assessment
 Our tech teams are curious, driven, intelligent, pragmatic, collaborative and open-minded and you should be too.
 ## Testing Goals
-We think infrastructure is best represented as code, and provisioning of resources should be automated as much as possible.	We are testing your ability to implement modern automated infrastructure, as well as general knowledge of operations. In your solution you should emphasize readability, security, maintainability and DevOps methodologies.
+We are interested to see how you approach a problem, which involves designing and building an application that's underpinned by good software engineering practises.
+We are testing your ability to implement modern automated infrastructure, as well as general knowledge of operations. In your solution you should emphasize readability, security, maintainability and DevOps methodologies.
 
 ## The Task
-Your task is to create a CI/CD pipeline that deploys this web application to a load-blanced environment on AWS Fargate / EKS.
+Your task is to design and document the setup needed for a web application, and write the basic code needed to create a CI/CD pipeline that deploys this web application to a load-blanced environment on AWS Fargate / EKS.
 
 You will have approximately 1 week to complete this task and should focus on an MVP but you are free to take this as far as you wish.
 ## The Solution
@@ -24,5 +25,14 @@ Your CI Job should:
 - `npm test` runs the application tests
 - `npm start` starts the http server
 
-## When you are finished
-Create a public Github repository and push your solution including any documentation you feel necessary. Commit often - we would rather see a history of trial and error than a single monolithic push. When you're finished, please send us the URL to the repository.
+## Evaluation
+We take into account 5 areas when evaluating a solution. Each criteria is evaluated from 0 (non-existent) to 5 (excellent) and your final score would be a simple average across all 5 areas. These are:
+
+- Functionality: Performance and structure of solution?
+- Good Practices: What are the good coding standard that we should be following?
+- Testing: Test to carry out to ensure code is working as expected.
+- Maintainability: Ensuring the solution is easy to run and update
+- Task definition: What level of details are needed to communicate the steps of the task to other team members? 
+
+## Reviewing your solution
+The second round interview we work as whiteboarding session, where we can go through your thoughts and designs for the above test
