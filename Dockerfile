@@ -20,8 +20,8 @@ COPY *.js .
 # Use --chown on COPY commands to set file permissions
 USER node
 
-# Copy the healthcheck script
-COPY --chown=node:node ./app/healthcheck/ .
+# # Copy the healthcheck script
+# COPY --chown=node:node ./app/healthcheck/ .
 
 # Copy remaining source code AFTER installing dependencies. 
 # Again, copy only the necessary files
