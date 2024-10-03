@@ -1,0 +1,22 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.10.7/.schema/devbox.schema.json",
+  "packages": [
+    "nodejs_20",
+    "kubectl@latest",
+    "awscli2@latest",
+    "go@latest",
+    "go-task@latest",
+    "kustomize@latest",
+    "jq@latest",
+    "terraform@1.8.5"
+  ],
+  "shell": {
+    "init_hook": [
+      "export GOBIN=$(git rev-parse --show-toplevel)/bin",
+      "export PATH=$GOBIN:$PATH"
+    ],
+    "scripts": {
+      "test": ["echo \"Error: no test specified\" && exit 1"]
+    }
+  }
+}
