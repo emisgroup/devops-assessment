@@ -1,0 +1,76 @@
+name: Build and Push to ECR
+
+on:
+  push:
+    branches:
+      - task/devops-v1  # Adjust to your main branch
+  pull_request:
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    env:
+      ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_URI }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+
+    steps:
+      # Checkout code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install Task
+        run: |
+          sudo sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
+
+      # Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20' # Specify the Node.js version
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Formatting checks using Prettier
+      - name: Run Prettier check
+        run: npm run prettier -- --check "**/*.js"
+        # Ensure you have a script like "prettier": "prettier" in your package.json
+
+      # Security checks using npm audit
+      - name: Run npm audit for security vulnerabilities
+        run: npm audit --audit-level=high
+
+      # Run tests (optional, add your testing script here)
+      - name: Run tests
+        run: npm test
+
+      # Not checking for code coverage in this example due to key is not  available
+      # SonarQube scan
+      # - name: Run SonarQube scan
+      #   uses: sonarsource/sonarcloud-github-action@v1.11
+      #   with:
+      #     projectKey: emis-project-api  # Replace with your SonarQube project key
+      #     organization: emis-org  # Replace with your SonarQube organization
+      #     token: ${{ secrets.SONAR_TOKEN }}
+
+      # Log in to Amazon ECR
+      - name: Log in to Amazon ECR
+        id: ecr_login
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws configure set default.region $AWS_REGION
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY_URI }}
+
+      # Build Docker image
+      - name: Build Docker image
+        run: |
+          task build
+
+      # Push Docker image to ECR
+      - name: Push Docker image to ECR
+        run: |
+           task ecr-push
