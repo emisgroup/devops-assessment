@@ -1,1 +1,1 @@
-console.log('Fake test')
+console.log("Fake test");

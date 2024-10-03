@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node app/src/index.js",
-    "test": "node app/test/index.test.js"
+    "test": "node app/test/index.test.js",
+    "prettier": "prettier --check --write '**/*.js'"
   },
   "author": "Sam Clement",
   "license": "ISC",
