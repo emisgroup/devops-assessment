@@ -52,7 +52,7 @@ tasks:
       - task: stop
       - task: run
   
-   ecr-push:
+  ecr-push:
     desc: Push the docker image to ECR
     cmds:
-      - docker push {{.ECR_REPOSITORY}}}:{{.BUILD_TAG}}
+      - docker push {{.ECR_REPOSITORY}}:{{.BUILD_TAG}}

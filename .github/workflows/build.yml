@@ -1,10 +1,10 @@
 name: Build and Push to ECR
 
-on:
-  push:
-    branches:
-      - task/devops-v1  # Adjust to your main branch
-  pull_request:
+on: [push]
+  # push:
+  #   branches:
+  #     - task/devops-v1  # Adjust to your main branch
+  # pull_request:
 
 jobs:
   build:
@@ -20,9 +20,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Install Task
-        run: |
-          sudo sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
 
       # Set up Node.js
       - name: Set up Node.js
@@ -32,7 +29,9 @@ jobs:
 
       # Install dependencies
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install
+          npm install -g @go-task/cli
 
       # Formatting checks using Prettier
       - name: Run Prettier check
@@ -67,12 +66,18 @@ jobs:
           echo $ECR_REPOSITORY
           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY
 
+      # - name: Install Task
+      #   run: |
+      #     sudo sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d
+
+      # Verify Task is installed
+      - name: Verify Task installation
+        run: task --version
+
       # Build Docker image
       - name: Build Docker image
-        run: |
-          task build
+        run: task build
 
       # Push Docker image to ECR
       - name: Push Docker image to ECR
-        run: |
-           task ecr-push
+        run: task ecr-push
