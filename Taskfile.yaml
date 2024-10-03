@@ -55,4 +55,4 @@ tasks:
   ecr-push:
     desc: Push the docker image to ECR
     cmds:
-      - docker push {{.ECR_REPOSITORY}}:{{.BUILD_TAG}}
+      - docker push {{.ECR_REPO}}/emis-health/{{.IMAGE_NAME}}:{{.BUILD_TAG}}
