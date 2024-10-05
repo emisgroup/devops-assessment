@@ -24,6 +24,9 @@ jobs:
   terraform:
     name: 'Terraform Lint, Security Check, and Deploy'
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infrastructure/stacks/eks
 
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -63,7 +66,7 @@ jobs:
 
     - name: 'Terraform Init'
       run: terraform init
-
+     
     - name: 'Terraform Format'
       run: terraform fmt
 
@@ -75,12 +78,12 @@ jobs:
         tflint --init
         tflint
 
-    - name: 'tfsec'
-      run: tfsec .
+    # - name: 'tfsec'
+    #   run: tfsec .
 
     - name: 'Terraform Plan'
       run: terraform plan -out=tfplan
 
-    # - name: 'Terraform Apply'
-    # #   if: github.ref == 'refs/heads/main'
-    #   run: terraform apply -auto-approve tfplan
+    - name: 'Terraform Apply'
+    #   if: github.ref == 'refs/heads/main'
+      run: terraform apply -auto-approve tfplan

@@ -1,5 +1,3 @@
-# main.tf
-
 terraform {
     required_version = ">= 1.8.0"
     required_providers {
@@ -14,9 +12,6 @@ terraform {
         key            = "envs/dev/terraform.tfstate"
         region         = "eu-west-2"
         encrypt        = true
-        dynamodb_table = "terraform-state-lock"
+        dynamodb_table = "terraform-state-locking"
     }
 }
-
-
-# Add more resources here...

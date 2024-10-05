@@ -11,6 +11,7 @@ env:
   ECR_REPOSITORY_URI: ${{ secrets.ECR_REPOSITORY_URI }}
   AWS_REGION: ${{ secrets.AWS_REGION }}
   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  ASSUME_ROLE_ARN: ${{ secrets.ASSUME_ROLE_ARN }}
 permissions:
   id-token: write
   contents: read
@@ -27,7 +28,7 @@ jobs:
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::635395011038:role/emis-ecr-access-role
+          role-to-assume: ${{env.ASSUME_ROLE_ARN}}
           role-session-name: emis-github-actions-session
           aws-region: ${{ env.AWS_REGION }}
 

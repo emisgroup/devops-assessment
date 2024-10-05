@@ -1,6 +1,6 @@
 # Provider configuration
 provider "aws" {
-  region = "eu-west-2" # Specify your desired region
+  region = var.region # Specify your desired region
 }
 
 # Create a VPC for EKS
@@ -17,7 +17,7 @@ resource "aws_subnet" "eks_subnet" {
   count = 3
   vpc_id = aws_vpc.eks_vpc.id
   cidr_block = "10.0.${count.index}.0/24"
-  availability_zone = element(data.aws_availability_zones.available.names, count.index)
+  # availability_zone = element(data.aws_availability_zones.available.names, count.index)
 
   tags = {
     Name = "emis-eks-subnet-${count.index}"
@@ -147,7 +147,7 @@ resource "aws_iam_role_policy_attachment" "eks_ec2_container_registry_policy" {
 
 # EKS Cluster
 resource "aws_eks_cluster" "eks_cluster" {
-  name     = "emis-eks-cluster"
+  name     = var.cluster_name
   role_arn = aws_iam_role.eks_cluster_role.arn
 
   vpc_config {
@@ -165,7 +165,7 @@ resource "aws_eks_cluster" "eks_cluster" {
 resource "aws_eks_node_group" "eks_node_group" {
     node_role_arn = aws_iam_role.eks_node_role.arn
     cluster_name    = aws_eks_cluster.eks_cluster.name
-    node_group_name = "emis-eks-node-group"
+    node_group_name = var.node_group_name
     subnet_ids      = aws_subnet.eks_subnet[*].id
 
   scaling_config {
