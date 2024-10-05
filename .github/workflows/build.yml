@@ -1,25 +1,35 @@
 name: Build and Push to ECR
 
-on: [push]
-  # push:
-  #   branches:
-  #     - task/devops-v1  # Adjust to your main branch
-  # pull_request:
-
+on:
+  push:
+    branches:
+      - task/devops-v1  # Adjust to your main branch
+  pull_request:
+    branches:
+      - task/devops-v1  # Adjust to your main branch
+env:
+  ECR_REPOSITORY_URI: ${{ secrets.ECR_REPOSITORY_URI }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+permissions:
+  id-token: write
+  contents: read
 jobs:
   build:
     name: Build and Test
     runs-on: ubuntu-latest
-
-    env:
-      ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_URI }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
 
     steps:
       # Checkout code
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::635395011038:role/emis-ecr-access-role
+          role-session-name: emis-github-actions-session
+          aws-region: ${{ env.AWS_REGION }}
 
       # Set up Node.js
       - name: Set up Node.js
@@ -53,18 +63,13 @@ jobs:
       #   with:
       #     projectKey: emis-project-api  # Replace with your SonarQube project key
       #     organization: emis-org  # Replace with your SonarQube organization
-      #     token: ${{ secrets.SONAR_TOKEN }}
+      #     token: $SONAR_TOKEN
 
       # Log in to Amazon ECR
       - name: Log in to Amazon ECR
         id: ecr_login
         run: |
-          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws configure set default.region $AWS_REGION
-          echo $AWS_REGION
-          echo $ECR_REPOSITORY
-          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY_URI
 
       # - name: Install Task
       #   run: |
