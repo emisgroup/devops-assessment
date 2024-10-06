@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emis-api-node
+  namespace: emis-ns
+  labels:
+    app: emis-api-node
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: emis-api-node
+  template:
+    metadata:
+      labels:
+        app: emis-api-node
+    spec:
+      containers:
+        - name: emis-api-node
+          image: 635395011038.dkr.ecr.eu-west-2.amazonaws.com/emis:latest
+          env:
+            - name: PORT
+              value: "3000"
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          # readinessProbe:
+          #   httpGet:
+          #     path: /ping
+          #     port: 3000
+          resources:
+            limits:
+              memory: "100Mi"
+            requests:
+              memory: "100Mi"
+              cpu: "50m"
+          securityContext:
+            allowPrivilegeEscalation: false
+            privileged: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault

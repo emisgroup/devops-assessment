@@ -29,7 +29,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{env.ASSUME_ROLE_ARN}}
-          role-session-name: emis-github-actions-session
+          role-session-name: emis-github-actions-build-session
           aws-region: ${{ env.AWS_REGION }}
 
       # Set up Node.js

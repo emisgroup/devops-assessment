@@ -3,20 +3,6 @@ name: Terraform CI/CD
 on:
   workflow_dispatch:
   
-    
-  push:
-    branches:
-      - task/devops-v1
-    paths:
-      - 'infrastructure/stacks/**'
-      - '.github/workflows/infra.yml'
-  pull_request:
-    branches:
-      - task/devops-v1
-    paths:
-      - 'infrastructure/stacks/**'
-      - '.github/workflows/infra.yml'
-
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   ASSUME_ROLE_ARN: ${{ secrets.ASSUME_ROLE_ARN }}
@@ -45,7 +31,7 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v4
       with:
         role-to-assume: ${{env.ASSUME_ROLE_ARN}}
-        role-session-name: emis-github-actions-session
+        role-session-name: emis-github-actions-infra-session
         aws-region: ${{ env.AWS_REGION }}
 
 

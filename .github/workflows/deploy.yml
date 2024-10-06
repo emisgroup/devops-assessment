@@ -1,0 +1,64 @@
+name: Deploy to EKS Cluster
+
+on:
+  workflow_dispatch:
+  
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ASSUME_ROLE_ARN: ${{ secrets.ASSUME_ROLE_ARN }}
+  EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
+  ECR_REPOSITORY_URI: ${{ secrets.ECR_REPOSITORY_URI }}
+  IMAGE_URI: "635395011038.dkr.ecr.eu-west-2.amazonaws.com/emis:latest"
+
+jobs:
+  deploy:
+    name: Deploy to EKS Cluster
+    runs-on: ubuntu-latest
+
+
+    steps:
+      # Check out the code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Set up AWS CLI
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{env.ASSUME_ROLE_ARN}}
+          role-session-name: emis-github-actions-deploy-session
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Update kubeconfig for EKS
+      - name: Update kubeconfig for EKS
+        id: kubeconfig
+        run: |
+          aws eks update-kubeconfig --name $EKS_CLUSTER_NAME --region $AWS_REGION
+
+      # Set up kubectl
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      # Login to ECR to pull Docker images
+      - name: Log in to Amazon ECR
+        id: ecr_login
+        run: |
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY_URI
+
+      # Update the Kubernetes deployment with the new Docker image
+      - name: Deploy to EKS
+        run: |
+   
+          # Apply the Kubernetes manifests (deployment and service)
+          kubectl apply -f ./k8s/namespace.yml
+          kubectl apply -f ./k8s/deployment.yml
+          kubectl apply -f ./k8s/service.yml
+          kubectl apply -f ./k8s/ingress.yml
+
+
+      # Verify deployment
+      - name: Verify deployment
+        run: |
+          kubectl rollout status deployment/emis-api-node

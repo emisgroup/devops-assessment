@@ -1,0 +1,6 @@
+apiVerstion: v1
+kind: Namespace
+metadata:
+  name: emis-ns
+  labels:
+    name: emis-ns
