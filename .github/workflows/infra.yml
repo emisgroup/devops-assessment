@@ -4,15 +4,30 @@ on:
   push:
     branches:
       - task/devops-v1
-    paths:
-      - 'infrastructure/stacks/**'
-      - '.github/workflows/infra.yml'
-  pull_request:
-    branches:
-      - task/devops-v1
-    paths:
-      - 'infrastructure/stacks/**'
-      - '.github/workflows/infra.yml'
+  workflow_dispatch:
+    inputs:
+      tf-stage:
+        description: 'Terraform stage'
+        required: true
+        default: 'plan'
+        type: choice
+        options:
+            - plan
+            - plan & apply
+
+    
+  # push:
+  #   branches:
+  #     - task/devops-v1
+  #   paths:
+  #     - 'infrastructure/stacks/**'
+  #     - '.github/workflows/infra.yml'
+  # pull_request:
+  #   branches:
+  #     - task/devops-v1
+  #   paths:
+  #     - 'infrastructure/stacks/**'
+  #     - '.github/workflows/infra.yml'
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -29,7 +44,6 @@ jobs:
         working-directory: infrastructure/stacks/eks
 
     env:
-      AWS_REGION: ${{ secrets.AWS_REGION }}
       TF_VERSION: '1.8.5'
       TFLINT_VERSION: '0.46.1'  # Updated to a more recent version
       TFSEC_VERSION: '1.28.1'   # Updated to a more recent version
@@ -82,8 +96,9 @@ jobs:
     #   run: tfsec .
 
     - name: 'Terraform Plan'
+      if: ${{ github.event.inputs.tf-stage == 'plan' || github.event.inputs.tf-stage == 'plan & apply' }}
       run: terraform plan -out=tfplan
 
     - name: 'Terraform Apply'
-    #   if: github.ref == 'refs/heads/main'
+      if: ${{ github.event.inputs.tf-stage == 'plan & apply' }}
       run: terraform apply -auto-approve tfplan
