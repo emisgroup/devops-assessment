@@ -6,7 +6,7 @@ provider "aws" {
 # Create a VPC for EKS
 resource "aws_vpc" "eks_vpc" {
   cidr_block = "10.0.0.0/16"
-
+  
   tags =  merge(local.standard_tags, {
     Name = "emis-eks-vpc"
   })
@@ -17,6 +17,8 @@ resource "aws_subnet" "eks_subnet" {
   count      = 3
   vpc_id     = aws_vpc.eks_vpc.id
   cidr_block = "10.0.${count.index}.0/24"
+  map_public_ip_on_launch = true
+  
   # availability_zone = element(data.aws_availability_zones.available.names, count.index)
 
   tags = merge(local.standard_tags, {
@@ -136,7 +138,7 @@ resource "aws_iam_role_policy_attachment" "eks_worker_node_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSCNIPolicy"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
   role       = aws_iam_role.eks_node_role.name
 }
 
