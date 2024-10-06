@@ -7,30 +7,30 @@ provider "aws" {
 resource "aws_vpc" "eks_vpc" {
   cidr_block = "10.0.0.0/16"
 
-  tags = {
+  tags =  merge(local.standard_tags, {
     Name = "emis-eks-vpc"
-  }
+  })
 }
 
 # Create subnets in different availability zones
 resource "aws_subnet" "eks_subnet" {
-  count = 3
-  vpc_id = aws_vpc.eks_vpc.id
+  count      = 3
+  vpc_id     = aws_vpc.eks_vpc.id
   cidr_block = "10.0.${count.index}.0/24"
   # availability_zone = element(data.aws_availability_zones.available.names, count.index)
 
-  tags = {
+  tags = merge(local.standard_tags, {
     Name = "emis-eks-subnet-${count.index}"
-  }
+  })
 }
 
 # Internet Gateway
 resource "aws_internet_gateway" "eks_igw" {
   vpc_id = aws_vpc.eks_vpc.id
 
-  tags = {
+  tags = merge(local.standard_tags, {
     Name = "emis-eks-igw"
-  }
+  })
 }
 
 # Route table for public access to the internet
@@ -42,21 +42,21 @@ resource "aws_route_table" "eks_route_table" {
     gateway_id = aws_internet_gateway.eks_igw.id
   }
 
-  tags = {
+  tags = merge(local.standard_tags, {
     Name = "emis-eks-route-table"
-  }
+  })
 }
 
 # Associate subnets with the route table
 resource "aws_route_table_association" "eks_route_table_association" {
-  count = 3
-  subnet_id = aws_subnet.eks_subnet[count.index].id
+  count          = 3
+  subnet_id      = aws_subnet.eks_subnet[count.index].id
   route_table_id = aws_route_table.eks_route_table.id
 }
 
 # EKS Security Group
 resource "aws_security_group" "eks_sg" {
-  vpc_id = aws_vpc.eks_vpc.id
+  vpc_id      = aws_vpc.eks_vpc.id
   description = "Allow all traffic for EKS"
 
   ingress {
@@ -73,9 +73,9 @@ resource "aws_security_group" "eks_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
+  tags = merge(local.standard_tags, {
     Name = "emis-eks-security-group"
-  }
+  })
 }
 
 # EKS Cluster IAM Role
@@ -93,9 +93,9 @@ resource "aws_iam_role" "eks_cluster_role" {
     }]
   })
 
-  tags = {
+  tags = merge(local.standard_tags, {
     Name = "emis-eks-cluster-role"
-  }
+  })
 }
 
 # Attach the EKS policies to the role
@@ -124,9 +124,9 @@ resource "aws_iam_role" "eks_node_role" {
     }]
   })
 
-  tags = {
+  tags = merge(local.standard_tags, {
     Name = "emis-eks-node-role"
-  }
+  })
 }
 
 # Attach the worker node policies to the role
@@ -149,9 +149,12 @@ resource "aws_iam_role_policy_attachment" "eks_ec2_container_registry_policy" {
 resource "aws_eks_cluster" "eks_cluster" {
   name     = var.cluster_name
   role_arn = aws_iam_role.eks_cluster_role.arn
+  tags = merge(local.standard_tags, {
+    Name = var.cluster_name
+  })
 
   vpc_config {
-    subnet_ids = aws_subnet.eks_subnet[*].id
+    subnet_ids         = aws_subnet.eks_subnet[*].id
     security_group_ids = [aws_security_group.eks_sg.id]
   }
 
@@ -163,10 +166,11 @@ resource "aws_eks_cluster" "eks_cluster" {
 
 # EKS Node Group
 resource "aws_eks_node_group" "eks_node_group" {
-    node_role_arn = aws_iam_role.eks_node_role.arn
-    cluster_name    = aws_eks_cluster.eks_cluster.name
-    node_group_name = var.node_group_name
-    subnet_ids      = aws_subnet.eks_subnet[*].id
+  node_role_arn   = aws_iam_role.eks_node_role.arn
+  cluster_name    = aws_eks_cluster.eks_cluster.name
+  node_group_name = var.node_group_name
+  subnet_ids      = aws_subnet.eks_subnet[*].id
+  tags            = merge(local.standard_tags, {})
 
   scaling_config {
     desired_size = 3
