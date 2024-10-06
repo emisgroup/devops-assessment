@@ -59,3 +59,4 @@ tasks:
     desc: Push the docker image to ECR
     cmds:
       - docker push {{.ECR_REPO}}:latest
+      - docker push {{.ECR_REPO}}:{{.BUILD_TAG}}
