@@ -9,6 +9,9 @@ env:
   EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
   ECR_REPOSITORY_URI: ${{ secrets.ECR_REPOSITORY_URI }}
   IMAGE_URI: "635395011038.dkr.ecr.eu-west-2.amazonaws.com/emis:latest"
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   deploy:
@@ -55,7 +58,7 @@ jobs:
           kubectl apply -f ./k8s/namespace.yml
           kubectl apply -f ./k8s/deployment.yml
           kubectl apply -f ./k8s/service.yml
-          kubectl apply -f ./k8s/ingress.yml
+          kubectl apply -f ./k8s/Ingress.yml
 
 
       # Verify deployment
