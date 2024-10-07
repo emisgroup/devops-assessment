@@ -9,6 +9,7 @@ env:
   EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
   ECR_REPOSITORY_URI: ${{ secrets.ECR_REPOSITORY_URI }}
   IMAGE_URI: "635395011038.dkr.ecr.eu-west-2.amazonaws.com/emis:latest"
+  WORKING_DIR: 'k8s'
 permissions:
   id-token: write
   contents: read
@@ -55,10 +56,10 @@ jobs:
         run: |
    
           # Apply the Kubernetes manifests (deployment and service)
-          kubectl apply -f ./k8s/namespace.yml
-          kubectl apply -f ./k8s/deployment.yml
-          kubectl apply -f ./k8s/service.yml
-          kubectl apply -f ./k8s/Ingress.yml
+          kubectl apply -f $WORKING_DIR/namespace.yml
+          kubectl apply -f $WORKING_DIR/deployment.yml
+          kubectl apply -f $WORKING_DIR/service.yml
+          kubectl apply -f $WORKING_DIR/Ingress.yml
 
 
       # Verify deployment
