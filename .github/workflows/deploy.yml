@@ -59,7 +59,7 @@ jobs:
           kubectl apply -f $WORKING_DIR/namespace.yml
           kubectl apply -f $WORKING_DIR/deployment.yml
           kubectl apply -f $WORKING_DIR/service.yml
-          kubectl apply -f $WORKING_DIR/Ingress.yml
+          # kubectl apply -f $WORKING_DIR/Ingress.yml
 
 
       # Verify deployment
